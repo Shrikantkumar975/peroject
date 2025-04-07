@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>CompareCart</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet"/>
+  <link
+  rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+/>
+<style>
+    .chatbot-box {
+  display: none;
+  flex-direction: column;
+  justify-content: space-between;
+  position: fixed;
+  bottom: 90px; /* adjust as per your layout */
+  right: 20px;
+  width: 300px;
+  height: 400px;
+  background: #fff;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+  border-radius: 12px;
+  overflow: hidden;
+  z-index: 999;
+}
+
+.chatbot-box.show {
+  display: flex !important;
+}
+
+.chat-content {
+  flex: 1;
+  padding: 10px;
+  overflow-y: auto;
+  scroll-behavior: smooth;
+}
+
+.chat-input {
+  display: flex;
+  padding: 10px;
+  border-top: 1px solid #ccc;
+  background: #f9f9f9;
+}
+
+.chat-input input {
+  flex: 1;
+  padding: 8px;
+  border: none;
+  outline: none;
+  border-radius: 6px;
+  margin-right: 5px;
+}
+
+.chat-input button {
+  padding: 8px 12px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.chat-input button:hover {
+  background-color: #0056b3;
+}
+
+</style>
+</head>
+<body>
+
+  <header>
+    <div class="logo">CompareCart</div>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="#">Categories</a>
+      <a href="#">Deals</a>
+      <a href="about.html">About</a>
+    </nav>
+  </header>
+
+  <section class="hero-section">
+    <div class="hero-content">
+      <h1>Discover Smart Savings</h1>
+      <p>Compare prices across top Indian stores, track discounts, and make smarter buying decisions with AI-powered assistance.</p>
+    </div>
+    <div class="hero-image">
+      <img src="images/image.png" alt="Shopping Image" />
+    </div>
+  </section>
+
+
+  <div class="main-search-section">
+    <input type="text" id="main-search" placeholder="Search for products...">
+    <!-- <section class="search-section">
+      <input type="text" placeholder="Search for products, brands, or categories..." />
+      <div class="ai-tag">AI-Powered</div>
+    </section> -->
+    <button id="main-search-btn">
+      <i class="fas fa-search"></i> Search
+    </button>
+  </div>
+  
+  <!-- Also add a div to show main results -->
+  <div id="main-results"></div>
+  
+
+  <!-- Somewhere below your search bar on main page -->
+<!-- <div id="main-results" class="main-result-container"></div> -->
+
+<div id="main-results" class="product-grid"></div>
+
+<!-- //hello -->
+
+
+
+  <section class="category-section">
+    <h2>Browse <strong>Popular Categories</strong></h2>
+    <div class="categories">
+      <div class="category-card">📱<br>Smartphones</div>
+      <div class="category-card">👗<br>Fashion</div>
+      <div class="category-card">💻<br>Laptops</div>
+      <div class="category-card">📺<br>TVs</div>
+      <div class="category-card">🎧<br>Headphones</div>
+      <div class="category-card">📷<br>Cameras</div>
+    </div>
+  </section>
+
+  <section class="product-section">
+    <div class="product-header">
+      <h2>Popular Products</h2>
+    </div>
+    <div class="product-grid">
+      <!-- Example product card -->
+      <div class="product-card">
+        <img src="https://via.placeholder.com/300x200" alt="Product Image" />
+        <h3>Product Name 1</h3>
+        <p class="price">₹999 <span class="old-price">₹1299</span> <span class="discount">23% off</span></p>
+        <div class="stores"><span>Amazon</span><span>Flipkart</span></div>
+      </div>
+      <!-- Duplicate more as needed -->
+    </div>
+  </section>
+
+  <section class="why-shop-section">
+    <h2>Why Shop with CompareCart?</h2>
+    <div class="why-cards">
+      <div class="why-card">
+        <i class="fas fa-tags"></i>
+        <h3>Best Deals</h3>
+        <p>Find the best offers and discounts across platforms.</p>
+      </div>
+      <div class="why-card">
+        <i class="fas fa-bolt"></i>
+        <h3>Fast Search</h3>
+        <p>Instant comparison powered by AI.</p>
+      </div>
+      <div class="why-card">
+        <i class="fas fa-lock"></i>
+        <h3>Secure</h3>
+        <p>Safe redirections to trusted stores like Amazon and Flipkart.</p>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="footer-columns">
+      <div class="footer-column">
+        <h4>CompareCart</h4>
+        <ul>
+          <li><a href="#">About Us</a></li>
+          <li><a href="#">How It Works</a></li>
+          <li><a href="#">Terms</a></li>
+        </ul>
+      </div>
+      <div class="footer-column">
+        <h4>Support</h4>
+        <ul>
+          <li><a href="#">Contact</a></li>
+          <li><a href="#">FAQs</a></li>
+        </ul>
+      </div>
+      <div class="footer-column footer-social">
+        <h4>Follow Us</h4>
+        <a href="#"><i class="fab fa-instagram"></i></a>
+        <a href="#"><i class="fab fa-twitter"></i></a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Chatbot button and box -->
+  <button class="fab-button" id="chat-toggle"><i class="fas fa-robot"></i></button>
+  <div class="chatbot-box" id="chat-box">
+    <header>Ask CompareCart</header>
+    <div class="chat-content" id="chat-content"></div>
+    <div class="chat-input">
+      <input type="text" placeholder="Ask something..." id="chat-input" />
+      <button id="send-btn">Send</button>
+    </div>
+  </div>
+
+  <script src="js/chatbot.js"></script>
+</body>
+</html>
