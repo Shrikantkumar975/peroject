@@ -143,3 +143,54 @@ async function fetchAmazonProducts(query, target = "chatbot") {
   }
 }
 
+// 5 products list
+const allPopularProducts = [
+  {
+    name: "Apple AirPods Pro",
+    price: "₹24,999",
+    image: "https://via.placeholder.com/150?text=AirPods+Pro"
+  },
+  {
+    name: "Samsung Galaxy Watch",
+    price: "₹14,999",
+    image: "https://via.placeholder.com/150?text=Galaxy+Watch"
+  },
+  {
+    name: "Sony Headphones",
+    price: "₹29,999",
+    image: "https://via.placeholder.com/150?text=Sony+Headphones"
+  },
+  {
+    name: "Dell Laptop",
+    price: "₹49,999",
+    image: "https://via.placeholder.com/150?text=Dell+Laptop"
+  },
+  {
+    name: "Nike Shoes",
+    price: "₹3,999",
+    image: "https://via.placeholder.com/150?text=Nike+Shoes"
+  }
+];
+
+// Function to display 3 random products
+function displayRandomPopularProducts() {
+  const container = document.getElementById("popular-products-container");
+  container.innerHTML = ""; // Clear before adding
+
+  const shuffled = allPopularProducts.sort(() => Math.random() - 0.5);
+  const selected = shuffled.slice(0, 3); // pick 3 random
+
+  selected.forEach(product => {
+    const card = document.createElement("div");
+    card.className = "product-card";
+    card.innerHTML = `
+      <img src="${product.image}" alt="${product.name}">
+      <h3>${product.name}</h3>
+      <p>${product.price}</p>
+    `;
+    container.appendChild(card);
+  });
+}
+
+// Run when page loads
+window.addEventListener("DOMContentLoaded", displayRandomPopularProducts);
