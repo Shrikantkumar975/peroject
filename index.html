@@ -109,41 +109,22 @@
 <div id="main-results" class="product-grid"></div>
 
 
-  <section class="category-section">
-    <h2>Browse <strong>Popular Categories</strong></h2>
-    <div class="categories">
-      <div class="category-card">📱<br>Smartphones</div>
-      <div class="category-card">👗<br>Fashion</div>
-      <div class="category-card">💻<br>Laptops</div>
-      <div class="category-card">📺<br>TVs</div>
-      <div class="category-card">🎧<br>Headphones</div>
-      <div class="category-card">📷<br>Cameras</div>
-    </div>
-  </section>
+<section class="category-section">
+  <h2>Browse <strong>Popular Categories</strong></h2>
+  <div class="categories">
+      <a href="#" class="category-card" data-category="smartphone">📱<br>Smartphones</a>
+      <a href="#" class="category-card" data-category="fashion">👗<br>Fashion</a>
+      <a href="#" class="category-card" data-category="laptop">💻<br>Laptops</a>
+      <a href="#" class="category-card" data-category="tv">📺<br>TVs</a>
+      <a href="#" class="category-card" data-category="headphones">🎧<br>Headphones</a>
+      <a href="#" class="category-card" data-category="camera">📷<br>Cameras</a>
+  </div>
+</section>
 
   <section class="popular-products">
-  <h2>Popular Products</h2>
-  <div class="product-grid">
-
-    <div class="product-card">
-      <img src="https://m.media-amazon.com/images/I/71zny7BTRlL._SX679_.jpg" alt="Apple AirPods Pro">
-      <h3>Apple AirPods Pro</h3>
-      <p>₹24,999</p>
-    </div>
-
-    <div class="product-card">
-      <img src="https://m.media-amazon.com/images/I/61vQF5VXoFL._SX679_.jpg" alt="Samsung Galaxy Watch">
-      <h3>Samsung Galaxy Watch 4</h3>
-      <p>₹14,999</p>
-    </div>
-
-    <div class="product-card">
-      <img src="https://m.media-amazon.com/images/I/71j5TPEEl1L._SY695_.jpg" alt="Nike Shoes">
-      <h3>Nike Revolution 6 Shoes</h3>
-      <p>₹3,999</p>
-    </div>
-
-  </div>
+    <h2>Popular Products</h2>
+    <div class="product-grid" id="popular-products-grid">
+        </div>
 </section>
 
   <section class="why-shop-section">
@@ -202,7 +183,7 @@
       <button id="send-btn">Send</button>
     </div>
   </div>
-
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.6.2/axios.min.js"></script>
   <script src="js/chatbot.js"></script>
 </body>
 </html>

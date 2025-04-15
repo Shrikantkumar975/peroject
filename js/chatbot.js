@@ -1,196 +1,416 @@
-// chatbot.js
+// Wait for DOM to fully load before accessing elements
+document.addEventListener("DOMContentLoaded", function() {
+  // Get DOM elements
+  const sendBtn = document.getElementById("send-btn");
+  const chatInput = document.getElementById("chat-input");
+  const chatContent = document.getElementById("chat-content");
+  const chatToggle = document.getElementById("chat-toggle");
+  const chatBox = document.getElementById("chat-box");
+  const mainSearchBtn = document.getElementById("main-search-btn");
+  const mainSearch = document.getElementById("main-search");
+  const mainResults = document.getElementById("main-results");
+  // const categoryCards = document.querySelectorAll(".category-card");
 
-// DOM Elements
-const chatToggle = document.getElementById("chat-toggle");
-const chatBox = document.getElementById("chat-box");
-const chatContent = document.getElementById("chat-content");
-const chatInput = document.getElementById("chat-input");
-const sendBtn = document.getElementById("send-btn");
-const mainSearchBtn = document.getElementById("main-search-btn");
-const mainSearch = document.getElementById("main-search");
 
-// Toggle Chatbot Visibility
-chatToggle.addEventListener("click", () => {
-  chatBox.classList.toggle("show");
-  const icon = chatToggle.querySelector("i");
-  icon.classList.toggle("fa-robot");
-  icon.classList.toggle("fa-comment-dots");
-  icon.style.transform = chatBox.classList.contains("show") ? "rotate(-15deg)" : "rotate(0deg)";
+  const categoryCards = document.querySelectorAll(".category-card"); // This will now select the <a> tags
+
+categoryCards.forEach(card => {
+    card.addEventListener("click", handleCategoryClick);
 });
+// Add event listeners to category cards
+categoryCards.forEach(card => {
+    card.addEventListener("click", handleCategoryClick);
+});
+  // Log elements to verify they're found
+  console.log("Chat elements loaded:", {
+    sendBtn, chatInput, chatContent, chatToggle, chatBox,
+    mainSearchBtn, mainSearch, mainResults
+  });
 
-// Append Message (User or Bot)
-function appendMessage(sender, message, isHTML = false) {
-  const msgDiv = document.createElement("div");
-  msgDiv.className = `message ${sender}`;
-  msgDiv.innerHTML = isHTML ? message : `<p>${message}</p>`;
-  chatContent.appendChild(msgDiv);
-  chatContent.scrollTop = chatContent.scrollHeight;
-}
-
-// Show Typing Animation
-function showTyping() {
-  const typing = document.createElement("div");
-  typing.className = "message bot typing";
-  typing.innerHTML = "<i>Typing...</i>";
-  chatContent.appendChild(typing);
-  chatContent.scrollTop = chatContent.scrollHeight;
-  return typing;
-}
-
-// Display Static Product Card
-function displayProductCard(target = "chatbot") {
-  const card = `
-    <div class="product-card">
-      <img src="https://m.media-amazon.com/images/I/61nzPMNY8zL._AC_UY327_FMwebp_QL65_.jpg" alt="iPhone 14 Pro">
-      <div class="product-details">
-        <h4>Apple iPhone 14 Pro (256GB) - Space Black</h4>
-        <p>Super Retina XDR display, A16 Bionic chip, Pro camera system</p>
-        <strong>₹1,19,999</strong>
-        <span class="source">From: Amazon</span>
-      </div>
-    </div>
-  `;
-  if (target === "chatbot") {
-    appendMessage("bot", card, true);
-  } else {
-    document.getElementById("main-results").innerHTML = card;
+  // Toggle chatbot visibility
+  if (chatToggle) {
+    chatToggle.addEventListener("click", () => {
+      console.log("Chat toggle clicked");
+      chatBox.classList.toggle("show");
+      chatToggle.classList.toggle("open");
+    });
   }
-}
 
-// Handle Chatbot Send Button
-sendBtn.addEventListener("click", handleUserInput);
-chatInput.addEventListener("keypress", (e) => {
-  if (e.key === "Enter") handleUserInput();
-});
+  // Event listeners for chat functionality
+  if (sendBtn && chatInput) {
+    sendBtn.addEventListener("click", () => {
+      console.log("Send button clicked");
+      handleUserMessage();
+    });
 
-function handleUserInput() {
-  const userMsg = chatInput.value.trim();
-  if (!userMsg) return;
-  appendMessage("user", userMsg);
-  chatInput.value = "";
+    chatInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        console.log("Enter key pressed in chat input");
+        handleUserMessage();
+      }
+    });
+  }
 
-  const typing = showTyping();
+  // Event listeners for main search
+  if (mainSearchBtn && mainSearch) {
+    mainSearchBtn.addEventListener("click", () => {
+      console.log("Main search button clicked");
+      handleMainSearch();
+    });
 
-  setTimeout(() => {
-    typing.remove();
+    mainSearch.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        console.log("Enter key pressed in main search");
+        handleMainSearch();
+      }
+    });
+  }
 
-    if (userMsg.toLowerCase().includes("price") || userMsg.toLowerCase().includes("buy")) {
-      fetchAmazonProducts(userMsg, "chatbot");
-    } else {
-      appendMessage("bot", "Try something like 'buy iPhone' or 'laptop price'.");
-    }
-  }, 1000);
-}
+  // ScrapingDog Amazon API configuration
+  const API_KEY = '67fe00534ff79a8d543a802b';
+  const API_URL = 'https://api.scrapingdog.com/amazon/search';
 
-// Main Search
-mainSearchBtn.addEventListener("click", handleMainSearch);
-mainSearch.addEventListener("keypress", (e) => {
-  if (e.key === "Enter") handleMainSearch();
-});
+  // Handle user message in chatbot
+  function handleUserMessage() {
+    if (!chatInput || !chatContent) return;
 
-function handleMainSearch() {
-  const query = mainSearch.value.trim();
-  if (!query) return;
-  document.getElementById("main-results").innerHTML = ""; // Clear previous
-  fetchAmazonProducts(query, "main");
-}
+    const text = chatInput.value.trim();
+    console.log("Processing user message:", text);
 
-// Fetch Amazon Products
-async function fetchAmazonProducts(query, target = "chatbot") {
-  const url = `https://real-time-amazon-data.p.rapidapi.com/search?query=${encodeURIComponent(query)}&page=1&country=IN&sort_by=LOWEST_PRICE&product_condition=ALL&is_prime=false&deals_and_discounts=NONE`;
+    if (!text) return;
 
-  const options = {
-    method: "GET",
-    headers: {
-      "x-rapidapi-host": "real-time-amazon-data.p.rapidapi.com",
-      "x-rapidapi-key": "3e991feecfmsh090ad5d43bade33p1d5615jsn7c87c2c162dd"
-    }
-  };
+    // Add user message to chat
+    appendMessage(text, "user");
+    chatInput.value = "";
 
-  try {
-    const response = await fetch(url, options);
-    const result = await response.json();
-    console.log(result); // Debug log
+    // Show typing indicator
+    appendTypingIndicator();
 
-    if (result?.data?.products?.length) {
-      result.data.products.slice(0, 3).forEach(product => {
-        const img = product.thumbnail || "https://via.placeholder.com/150";
-        const title = product.title || "No Title";
-        const price = product.price || "Price N/A";
-        const link = product.url || "#";
-    
-        const card = `
-          <div class="product-card">
-            <img src="${img}" alt="${title}">
-            <div class="product-details">
-              <h4>${title}</h4>
-              <strong>${price}</strong>
-              <span class="source">From: Amazon</span><br>
-              <a href="${link}" target="_blank">View</a>
-            </div>
-          </div>
-        `;
-        if (target === "chatbot") appendMessage("bot", card, true);
-        else document.getElementById("main-results").innerHTML += card;
+    // Search for products
+    searchAmazonProducts(text)
+      .then(products => {
+        // Remove typing indicator
+        removeTypingIndicator();
+
+        if (products && products.length > 0) {
+          console.log("Products found:", products.slice(0, 3));
+          // Display top 3 product recommendations
+          appendMessage("Here are my top 3 recommendations for you:", "bot");
+
+          // Get the first 3 products (or fewer if less available)
+          const topThreeProducts = products.slice(0, 3);
+
+          // Display each product
+          topThreeProducts.forEach(product => {
+            appendProductMessage(product);
+          });
+        } else {
+          appendMessage("Sorry, I couldn't find any products matching your search.", "bot");
+        }
+      })
+      .catch(error => {
+        removeTypingIndicator();
+        appendMessage("Sorry, there was an error searching for products. Please try again later.", "bot");
+        console.error("API Error:", error);
       });
-    } else {
-      appendMessage("bot", "No Amazon products found.");
-    }
-    
-  } catch (err) {
-    console.error(err);
-    appendMessage("bot", "Amazon fetch error.");
   }
-}
 
-// 5 products list
-const allPopularProducts = [
-  {
-    name: "Apple AirPods Pro",
-    price: "₹24,999",
-    image: "https://via.placeholder.com/150?text=AirPods+Pro"
-  },
-  {
-    name: "Samsung Galaxy Watch",
-    price: "₹14,999",
-    image: "https://via.placeholder.com/150?text=Galaxy+Watch"
-  },
-  {
-    name: "Sony Headphones",
-    price: "₹29,999",
-    image: "https://via.placeholder.com/150?text=Sony+Headphones"
-  },
-  {
-    name: "Dell Laptop",
-    price: "₹49,999",
-    image: "https://via.placeholder.com/150?text=Dell+Laptop"
-  },
-  {
-    name: "Nike Shoes",
-    price: "₹3,999",
-    image: "https://via.placeholder.com/150?text=Nike+Shoes"
+  // Handle main search functionality
+  function handleMainSearch() {
+    if (!mainSearch || !mainResults) return;
+
+    const query = mainSearch.value.trim();
+    console.log("Processing main search:", query);
+
+    if (!query) return;
+
+    // Clear previous results
+    mainResults.innerHTML = "";
+
+    // Add loading indicator
+    mainResults.innerHTML = "<div style='text-align:center;padding:20px;'>Searching...</div>";
+
+    // Search for products
+    searchAmazonProducts(query)
+      .then(products => {
+        console.log("Main search results:", products);
+
+        // Get top 3 products for consistency with chatbot
+        const topThreeProducts = products.slice(0, 3);
+
+        // Display products in grid
+        displayProductsInGrid(topThreeProducts);
+      })
+      .catch(error => {
+        mainResults.innerHTML = "<div style='text-align:center;padding:20px;'>Error searching for products. Please try again.</div>";
+        console.error("API Error:", error);
+      });
   }
+
+  // Search Amazon products using ScrapingDog API
+  async function searchAmazonProducts(query) {
+    console.log("Searching Amazon for:", query);
+
+    try {
+      // Construct the API URL with parameters
+      const params = new URLSearchParams({
+        api_key: API_KEY,
+        query: query,
+        page: '1',
+        country: 'in', // Set country to India
+        postal_code: '144411', // Example postal code for India
+        domain: 'in'  // Set domain to Amazon India
+      });
+      const requestUrl = `${API_URL}?${params.toString()}`;
+
+      console.log("Making API request to:", requestUrl);
+
+      const response = await fetch(requestUrl);
+
+      if (!response.ok) {
+        throw new Error(`API responded with status ${response.status}`);
+      }
+
+      const data = await response.json();
+      console.log("API response data:", data);
+
+      // Process the API response
+      if (data && Array.isArray(data.products)) {
+        return data.products.map(product => ({
+          title: product.title || product.name || 'Product Name',
+          price: product.price || product.price_string || 'Price not available',
+          image: product.image || product.thumbnail || '',
+          url: product.link || product.url || '#',
+          rating: product.rating || 'N/A',
+          description: product.description || ''
+        }));
+      } else if (data && data.results && Array.isArray(data.results)) {
+        // Handle the 'results' array if 'products' is not present (based on ScrapingDog documentation)
+        return extractProductData(data);
+      }
+
+      return [];
+    } catch (error) {
+      console.error("API Error:", error);
+      throw error; // Re-throw the error to be caught by the calling function
+    }
+  }
+
+  // Function to extract essential product data from the API response
+  function extractProductData(apiResponse) {
+    // Check if we have valid data
+    if (!apiResponse || !apiResponse.results || !Array.isArray(apiResponse.results)) {
+      console.error("Invalid API response format");
+      return [];
+    }
+
+    // Extract essential details from each product
+    const products = apiResponse.results.map(product => {
+      // Only process search_product types
+      if (product.type !== "search_product") return null;
+
+      return {
+        title: product.title || "Unknown Product",
+        price: product.price_string || product.price || "Price not available",
+        image: product.image || "",
+        rating: product.stars || "N/A",
+        url: product.optimized_url || product.url || "#",
+        description: product.description || '' // Assuming description might be available
+      };
+    }).filter(product => product !== null);
+
+    return products;
+  }
+
+  // Append message to chat
+  function appendMessage(text, sender) {
+    if (!chatContent) return;
+
+    const messageDiv = document.createElement("div");
+    messageDiv.className = `message ${sender}`;
+    messageDiv.textContent = text;
+    chatContent.appendChild(messageDiv);
+    scrollToBottom();
+  }
+
+  // Add typing indicator
+  function appendTypingIndicator() {
+    if (!chatContent) return;
+
+    const typingDiv = document.createElement("div");
+    typingDiv.className = "message bot typing";
+    typingDiv.id = "typing-indicator";
+    typingDiv.textContent = "Searching products";
+    chatContent.appendChild(typingDiv);
+
+    // Add animated dots
+    const dotsSpan = document.createElement("span");
+    dotsSpan.className = "dots";
+    typingDiv.appendChild(dotsSpan);
+
+    scrollToBottom();
+  }
+
+  // Remove typing indicator
+  function removeTypingIndicator() {
+    const typingIndicator = document.getElementById("typing-indicator");
+    if (typingIndicator) {
+      typingIndicator.remove();
+    }
+  }
+
+  // Append product information to chat
+  function appendProductMessage(product) {
+    if (!chatContent) return;
+
+    const messageDiv = document.createElement("div");
+    messageDiv.className = "message bot product-message";
+
+    // Create product card for chat
+    messageDiv.innerHTML = `
+      <div class="bot-product-card">
+        <img src="${product.image}" alt="${product.title}" class="product-img" onerror="this.src='https://via.placeholder.com/100'">
+        <div class="product-info">
+          <h4>${product.title}</h4>
+          <p><strong>Price:</strong> ${product.price}</p>
+          <p><strong>Rating:</strong> ${product.rating || 'N/A'}</p>
+          <p><a href="${product.url}" target="_blank">View on Amazon</a></p>
+        </div>
+      </div>
+    `;
+
+    chatContent.appendChild(messageDiv);
+    scrollToBottom();
+  }
+
+  // Display products in main grid
+  function displayProductsInGrid(products) {
+    if (!mainResults) return;
+
+    // Clear results
+    mainResults.innerHTML = "";
+
+    if (!products || products.length === 0) {
+      mainResults.innerHTML = "<div style='text-align:center;padding:20px;'>No products found.</div>";
+      return;
+    }
+
+    // Add class to enable grid layout
+    mainResults.className = "product-grid";
+
+    // Create product cards
+    products.forEach(product => {
+      const productCard = document.createElement("div");
+      productCard.className = "product-card";
+
+      productCard.innerHTML = `
+        <img src="${product.image}" alt="${product.title}" onerror="this.src='https://via.placeholder.com/150'">
+        <div class="product-details">
+          <h4>${truncateText(product.title, 50)}</h4>
+          <p>${truncateText(product.description || '', 100)}</p>
+          <strong>${product.price}</strong>
+          <span class="source">Amazon</span>
+        </div>
+      `;
+
+      // Add click handler to open product page
+      productCard.addEventListener("click", () => {
+        window.open(product.url, "_blank");
+      });
+
+      mainResults.appendChild(productCard);
+    });
+  }
+
+  // Helper function to truncate text
+  function truncateText(text, maxLength) {
+    if (!text) return '';
+    if (text.length <= maxLength) return text;
+    return text.substring(0, maxLength) + "...";
+  }
+
+  // Scroll chat to bottom
+  function scrollToBottom() {
+    if (chatContent) {
+      chatContent.scrollTop = chatContent.scrollHeight;
+    }
+  }
+});
+
+
+document.addEventListener("DOMContentLoaded", function() {
+  // ... your existing chatbot.js code ...
+
+  const popularProductsGrid = document.getElementById("popular-products-grid");
+
+  function displayPopularProducts(products) {
+      if (!popularProductsGrid) return;
+      popularProductsGrid.innerHTML = ""; // Clear existing content
+
+      products.forEach(product => {
+          const productCard = document.createElement("div");
+          productCard.className = "product-card";
+          productCard.innerHTML = `
+              <img src="${product.image}" alt="${product.title}" onerror="this.src='https://via.placeholder.com/150'">
+              <h3>${product.title}</h3>
+              <p>${product.price}</p>
+          `;
+          popularProductsGrid.appendChild(productCard);
+      });
+  }
+
+  // Hardcoded smartphone data with (hopefully) working image URLs
+  const popularSmartphones = [
+    {
+        title: "Xiaomi 14 Pro",
+        price: "₹79,999",
+        image: "https://fdn2.gsmarena.com/vv/pics/xiaomi/xiaomi-14-pro-1.jpg"
+    },
+    {
+        title: "OnePlus 12",
+        price: "₹64,999",
+        image: "https://fdn2.gsmarena.com/vv/pics/oneplus/oneplus-12-1.jpg"
+    },
+  {
+      title: "OnePlus 13",
+      price: "₹69,999",
+      image: "https://fdn2.gsmarena.com/vv/pics/oneplus/oneplus-13-1.jpg"
+  },
 ];
 
-// Function to display 3 random products
-function displayRandomPopularProducts() {
-  const container = document.getElementById("popular-products-container");
-  container.innerHTML = ""; // Clear before adding
 
-  const shuffled = allPopularProducts.sort(() => Math.random() - 0.5);
-  const selected = shuffled.slice(0, 3); // pick 3 random
+  // Call displayPopularProducts with the hardcoded data
+  displayPopularProducts(popularSmartphones);
 
-  selected.forEach(product => {
-    const card = document.createElement("div");
-    card.className = "product-card";
-    card.innerHTML = `
-      <img src="${product.image}" alt="${product.name}">
-      <h3>${product.name}</h3>
-      <p>${product.price}</p>
-    `;
-    container.appendChild(card);
-  });
+  // ... rest of your chatbot.js code ...
+});
+
+async function handleCategoryClick(event) {
+  event.preventDefault(); // Prevent the default navigation of the <a> tag
+
+  const category = event.currentTarget.dataset.category;
+  console.log("Category clicked:", category);
+
+  if (category) {
+      // Clear previous results
+      const mainResults = document.getElementById("main-results");
+      if (mainResults) {
+          mainResults.innerHTML = "<div style='text-align:center;padding:20px;'>Searching for products in '" + category + "'...</div>";
+          mainResults.className = ""; // Remove product-grid class temporarily
+
+          try {
+              const products = await searchAmazonProducts(category);
+              if (products && products.length > 0) {
+                  displayProductsInGrid(products.slice(0, 3)); // Display top 3
+              } else {
+                  mainResults.innerHTML = "<div style='text-align:center;padding:20px;'>No products found in '" + category + "'.</div>";
+                  mainResults.className = "product-grid"; // Re-apply class if needed
+              }
+          } catch (error) {
+              console.error("Error searching for category:", error);
+              mainResults.innerHTML = "<div style='text-align:center;padding:20px;color:red;'>Error searching for products in this category. Please try again.</div>";
+              mainResults.className = "product-grid"; // Re-apply class if needed
+          }
+      }
+  }
 }
-
-// Run when page loads
-window.addEventListener("DOMContentLoaded", displayRandomPopularProducts);
